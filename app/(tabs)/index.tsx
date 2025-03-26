@@ -1,19 +1,18 @@
 import { drizzle, useLiveQuery } from "drizzle-orm/expo-sqlite";
-import { openDatabaseSync } from "expo-sqlite";
-import { FlatList, ScrollView, Text, View } from "react-native";
+import { useSQLiteContext } from "expo-sqlite";
+import { FlatList, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import * as schema from '@/db/schema/questions';
 import * as styles from '@/constants/styles';
-
-const expo = openDatabaseSync(
-  'db.db', 
-  { enableChangeListener: true }
-);
-
-const db = drizzle(expo);
+import Entypo from '@expo/vector-icons/Entypo';
+import { useRouter } from "expo-router";
 
 export default function Index() {
+  const db = useSQLiteContext();
+  const drizzleDb = drizzle(db);
+
   // Re-renders automatically when data changes
-  const { data } = useLiveQuery(db.select().from(schema.questionsTable));
+  const { data } = useLiveQuery(drizzleDb.select().from(schema.questionsTable));
+  const router = useRouter();
 
   return (
     <ScrollView className={styles.section}>
@@ -21,9 +20,14 @@ export default function Index() {
         data={data}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <View className={styles.subsection}>
+          <TouchableOpacity className={`${styles.subsection} flex-row justify-between items-center`}
+            onPress={() => router.push({
+              pathname: '/questions/[id]',
+              params: { id: item.id }
+            })}>
             <Text>{item.title}</Text>
-          </View>
+            <Entypo name="chevron-small-right" size={24} />
+          </TouchableOpacity>
         )}
         scrollEnabled={false}
         contentContainerClassName="gap-2"

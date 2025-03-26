@@ -7,8 +7,11 @@ import { questionsTable } from '@/db/schema/questions';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import migrations from '@/drizzle/migrations';
 import { openDatabaseSync, SQLiteProvider } from "expo-sqlite";
+import ToastManager from "toastify-react-native";
 
-const expoDb = openDatabaseSync('db.db');
+export const DATABASE_NAME = 'db.db';
+
+const expoDb = openDatabaseSync(DATABASE_NAME);
 const db = drizzle(expoDb);
 
 export default function RootLayout() {
@@ -45,6 +48,7 @@ export default function RootLayout() {
         useSuspense
       >
         <Stack>
+          <ToastManager />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen 
             name="add-question-modal" 

@@ -8,6 +8,20 @@
       "when": 1742985543587,
       "tag": "0000_bright_dexter_bennett",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1742989991460,
+      "tag": "0001_bright_wasp",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1743029712574,
+      "tag": "0002_salty_betty_ross",
+      "breakpoints": true
     }
   ]
 }
