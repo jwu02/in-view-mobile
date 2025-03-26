@@ -1,39 +1,61 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Stack } from "expo-router";
+import "./global.css";
+import { drizzle } from 'drizzle-orm/expo-sqlite';
+import { ActivityIndicator, Text, View } from 'react-native';
+import { Suspense, useEffect, useState } from 'react';
+import { questionsTable } from '@/db/schema/questions';
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
+import migrations from '@/drizzle/migrations';
+import { openDatabaseSync, SQLiteProvider } from "expo-sqlite";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+const expoDb = openDatabaseSync('db.db');
+const db = drizzle(expoDb);
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  const { success, error } = useMigrations(db, migrations);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
+  if (error) {
+    return (
+      <View>
+        <Text>Migration error: {error.message}</Text>
+      </View>
+    );
   }
+  if (!success) {
+    return (
+      <View>
+        <Text>Migration is in progress...</Text>
+      </View>
+    );
+  }
+  
+  // if (items === null || items.length === 0) {
+  //   return (
+  //     <View>
+  //       <Text>Empty</Text>
+  //     </View>
+  //   );
+  // }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Suspense fallback={<ActivityIndicator size="large" />}>
+      <SQLiteProvider
+        databaseName="db.db"
+        options={{ enableChangeListener: true }}
+        useSuspense
+      >
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen 
+            name="add-question-modal" 
+            options={{ 
+              title: 'Add Question',
+              presentation: 'modal',
+              // headerShown: false,
+            }} 
+          />
+        </Stack>
+      </SQLiteProvider>
+    </Suspense>
   );
 }
