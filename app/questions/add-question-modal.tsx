@@ -66,6 +66,7 @@ const AddQuestionModal = () => {
     <>
       <Stack.Screen 
         options={{ 
+          headerTitle: 'Add Question',
           headerLeft: () => (
             <Button title="Cancel" onPress={() => router.back()} />
           ),

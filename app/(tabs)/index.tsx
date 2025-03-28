@@ -22,8 +22,8 @@ export default function Index() {
         renderItem={({ item }) => (
           <TouchableOpacity className={`${styles.subsection} flex-row justify-between items-center`}
             onPress={() => router.push({
-              pathname: '/questions/[id]',
-              params: { id: item.id }
+              pathname: '/questions/[questionId]',
+              params: { questionId: item.id }
             })}>
             <Text>{item.title}</Text>
             <Entypo name="chevron-small-right" size={24} />

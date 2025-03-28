@@ -1,15 +1,16 @@
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useMemo } from 'react'
-import { Stack, useLocalSearchParams } from 'expo-router'
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router'
 import * as styles from '@/constants/styles'
 import { useSQLiteContext } from 'expo-sqlite';
 import { drizzle, useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { questionsTable } from '@/db/schema/questions';
 import { eq } from 'drizzle-orm';
 import { responsesTable } from '@/db/schema/responses';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const QuestionDetails = () => {
-  const { id } = useLocalSearchParams();
+  const { questionId } = useLocalSearchParams();
 
   const db = useSQLiteContext();
   const drizzleDb = drizzle(db);
@@ -27,7 +28,7 @@ const QuestionDetails = () => {
     })
     .from(questionsTable)
     .leftJoin(responsesTable, eq(questionsTable.id, responsesTable.questionId))
-    .where(eq(questionsTable.id, Number(id)))
+    .where(eq(questionsTable.id, Number(questionId)))
   );
 
   const question = useMemo(() => {
@@ -50,6 +51,8 @@ const QuestionDetails = () => {
   }, [data]);
   console.log(question);
 
+  const router = useRouter();
+
   return (
     <>
       <Stack.Screen options={{
@@ -70,18 +73,28 @@ const QuestionDetails = () => {
         
         <View className={styles.inputGroup}>
           <Text className={styles.groupTitle}>Responses</Text>
-          {question && question?.responses.length === 0 ?
-            question?.responses.map((response) => (
-              <View key={response.id} className={styles.subsection}>
-                <Text>{response.textContent}</Text>
-              </View>
-            ))
-            :
-            <View className={`${styles.subsection} items-center`}>
-              <Text>No responses recorded.</Text>
-            </View>
-            
-          }
+          <View className={styles.subsection}>
+            <TouchableOpacity className="flex-row items-center justify-center gap-1 mb-4 mx-auto" 
+              onPress={() => {
+                // Navigate to the add response screen
+                router.push({
+                  pathname: '/questions/[questionId]/responses/add-response',
+                  params: { questionId: questionId.toString() }
+                });
+              }}>
+              <Ionicons name="add-circle" size={20} />
+              <Text>Add a response</Text>
+            </TouchableOpacity>
+            {question && question?.responses.length === 0 ?
+              question?.responses.map((response) => (
+                <View key={response.id}>
+                  <Text>{response.textContent}</Text>
+                </View>
+              ))
+              :
+              <Text className="mx-auto">No responses recorded.</Text>
+            }
+          </View>
         </View>
       </ScrollView>
     </>

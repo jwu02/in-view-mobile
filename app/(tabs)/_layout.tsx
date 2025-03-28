@@ -16,7 +16,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <FontAwesome size={28} name="question-circle" color={color} />,
           headerRight: () => (
             <Button title="New" onPress={() => {
-              router.push('/add-question-modal');
+              router.push('/questions/add-question-modal');
             }} />
           ),
         }}

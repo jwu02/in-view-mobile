@@ -31,14 +31,6 @@ export default function RootLayout() {
       </View>
     );
   }
-  
-  // if (items === null || items.length === 0) {
-  //   return (
-  //     <View>
-  //       <Text>Empty</Text>
-  //     </View>
-  //   );
-  // }
 
   return (
     <Suspense fallback={<ActivityIndicator size="large" />}>
@@ -51,12 +43,18 @@ export default function RootLayout() {
           <ToastManager />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen 
-            name="add-question-modal" 
+            name="questions/add-question-modal" 
             options={{ 
               title: 'Add Question',
               presentation: 'modal',
               // headerShown: false,
             }} 
+          />
+          <Stack.Screen
+            name="questions/[id]/responses/add-response"
+            options={{
+              title: 'Add Response',
+            }}
           />
         </Stack>
       </SQLiteProvider>
