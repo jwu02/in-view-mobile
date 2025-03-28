@@ -61,6 +61,7 @@ const AddResponse = () => {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<ResponseFormData>({
     resolver: zodResolver(responseFormSchema),
@@ -70,6 +71,10 @@ const AddResponse = () => {
       videoPath: '',
     },
   });
+
+  const textValue = watch('text');
+  const audioPathValue = watch('audioPath');
+  const videoPathValue = watch('videoPath');
 
   const onSubmit = (data: ResponseFormData) => {
     // console.log('Form submitted:', data);
@@ -92,6 +97,16 @@ const AddResponse = () => {
     router.back();
   };
 
+  const disableAddButton = () => {
+    if (selectedResponse === 'text' && textValue ||
+        selectedResponse === 'audio' && audioPathValue ||
+        selectedResponse === 'video' && videoPathValue
+    ) {
+      return false;
+    }
+    return true; // For video, you can add your own logic
+  }
+
   return (
     <>
       <Stack.Screen 
@@ -99,7 +114,9 @@ const AddResponse = () => {
           headerTitle: 'Add Response',
           headerBackTitle: 'Details',
           headerRight: () => (
-            <Button title="Add" onPress={handleSubmit(onSubmit)} />
+            <Button title="Add" 
+              onPress={handleSubmit(onSubmit)} 
+              disabled={disableAddButton()} />
           ),
         }} 
       />
@@ -129,14 +146,6 @@ const AddResponse = () => {
               <VideoResponse />
             )}
           </View>
-        </View>
-
-        {/* errors */}
-        <View>
-          <Text>gello</Text>
-          {errors.text && <Text style={{ color: 'red' }}>{errors.text.message}</Text>}
-          {errors.audioPath && <Text style={{ color: 'red' }}>{errors.audioPath.message}</Text>}
-          {errors.videoPath && <Text style={{ color: 'red' }}>{errors.videoPath.message}</Text>}
         </View>
       </ScrollView>
     </>
